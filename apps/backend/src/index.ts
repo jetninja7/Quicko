@@ -5,6 +5,9 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import productsRoutes from './routes/products.routes';
 import categoriesRoutes from './routes/categories.routes';
+import addressesRoutes from './routes/addresses.routes';
+import ordersRoutes from './routes/orders.routes';
+import webhooksRoutes from './routes/webhooks.routes';
 
 dotenv.config();
 
@@ -16,6 +19,9 @@ app.use(cors({
   origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
   credentials: true,
 }));
+
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), webhooksRoutes);
+
 app.use(express.json());
 
 app.get('/health', (req, res) => {
@@ -25,6 +31,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/categories', categoriesRoutes);
+app.use('/api/addresses', addressesRoutes);
+app.use('/api/orders', ordersRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Quicko Backend running on port ${PORT}`);
@@ -33,4 +41,7 @@ app.listen(PORT, () => {
   console.log(`   - Auth: http://localhost:${PORT}/api/auth/*`);
   console.log(`   - Products: http://localhost:${PORT}/api/products`);
   console.log(`   - Categories: http://localhost:${PORT}/api/categories`);
+  console.log(`   - Addresses: http://localhost:${PORT}/api/addresses`);
+  console.log(`   - Orders: http://localhost:${PORT}/api/orders`);
+  console.log(`   - Webhooks: http://localhost:${PORT}/api/webhooks/stripe`);
 });
