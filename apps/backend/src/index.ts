@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes';
 
 dotenv.config();
 
@@ -19,6 +20,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+app.use('/api/auth', authRoutes);
+
 app.listen(PORT, () => {
   console.log(`🚀 Quicko Backend running on port ${PORT}`);
+  console.log(`📍 API endpoints:`);
+  console.log(`   - Health: http://localhost:${PORT}/health`);
+  console.log(`   - Auth: http://localhost:${PORT}/api/auth/*`);
 });
