@@ -1,6 +1,6 @@
 # Quicko Development Progress
 
-Last updated: 2026-07-25 (Phase 3 complete!)
+Last updated: 2026-07-25 (Phase 4 complete!)
 
 ## ✅ Completed
 
@@ -124,13 +124,46 @@ Last updated: 2026-07-25 (Phase 3 complete!)
 - Order confirmation with details
 - Estimated delivery time (25 mins)
 
+### Phase 4: Real-time Order Tracking (Complete) ✅
+**Backend:**
+- ✅ WebSocket server on `/ws` endpoint
+- ✅ Connection manager with auth verification
+- ✅ Client tracking by order ID
+- ✅ PATCH `/api/orders/:id/status` - Update order status
+- ✅ Broadcast updates to connected clients
+- ✅ Role-based authorization (admin/store/driver)
+- ✅ Auto-cleanup on disconnect
+
+**Frontend:**
+- ✅ `useOrderTracking` React hook
+- ✅ OrderTimeline component with visual progress
+- ✅ Real-time status updates on order page
+- ✅ Live connection indicator
+- ✅ Auto-reconnect on disconnect (3s delay)
+- ✅ WebSocket message handling
+
+**Features:**
+- Real-time updates without page refresh
+- 4-stage visual timeline with icons
+- Connection status indicator (🔴 Live tracking active)
+- Estimated delivery time display
+- Actual delivery time on completion
+- Token-based WebSocket authentication
+- Automatic reconnection logic
+
+**Timeline Stages:**
+1. ✓ Order Confirmed
+2. 📦 Preparing Order
+3. 🚗 Out for Delivery
+4. 🎉 Delivered
+
 ## 🚧 In Progress
 
 Nothing currently in progress.
 
 ## 📋 Up Next
 
-### Phase 4: Real-time Order Tracking (Next)
+### Phase 5: Delivery Driver App (Next)
 **Backend:**
 - [ ] GET `/api/products` - List products with filters (category, search, store)
 - [ ] GET `/api/products/:id` - Get product details
@@ -209,10 +242,11 @@ Nothing currently in progress.
 
 ## 📊 Progress Metrics
 
-- **Phases completed:** 3/6 (50% - Halfway to MVP!) 🎉
-- **Estimated time to MVP:** 1-3 weeks
-- **Lines of code:** ~5,000+ (backend + frontend)
-- **API endpoints:** 13 endpoints complete (3 auth + 3 products + 4 addresses + 3 orders)
+- **Phases completed:** 4/6 (67% - Two-thirds done!) 🎉
+- **Estimated time to MVP:** Days away!
+- **Lines of code:** ~6,000+ (backend + frontend)
+- **API endpoints:** 14 endpoints (3 auth + 3 products + 4 addresses + 3 orders + 1 status update)
+- **Real-time:** WebSocket server active
 
 ## 🧪 Testing Instructions
 
