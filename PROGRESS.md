@@ -1,6 +1,6 @@
 # Quicko Development Progress
 
-Last updated: 2026-07-25 (Phase 2 complete!)
+Last updated: 2026-07-25 (Phase 3 complete!)
 
 ## ✅ Completed
 
@@ -87,13 +87,50 @@ Last updated: 2026-07-25 (Phase 2 complete!)
 - Realistic pricing ($2-$16)
 - Stock levels (45-200 per item)
 
+### Phase 3: Checkout & Payments (Complete) ✅
+**Backend:**
+- ✅ Address management API (CRUD operations)
+- ✅ POST `/api/addresses` - Create new address
+- ✅ GET `/api/addresses` - List user addresses
+- ✅ PATCH `/api/addresses/:id/default` - Set default address
+- ✅ DELETE `/api/addresses/:id` - Delete address
+- ✅ POST `/api/orders` - Create order with Stripe payment
+- ✅ GET `/api/orders` - List user orders
+- ✅ GET `/api/orders/:id` - Get order details
+- ✅ POST `/api/webhooks/stripe` - Handle payment webhooks
+- ✅ Stripe service with mock mode fallback
+- ✅ Stock validation before order
+- ✅ Single-store order validation
+- ✅ Tax calculation (8.75% California)
+- ✅ Delivery fee ($4.99)
+- ✅ Auto-generate estimated delivery time
+
+**Frontend:**
+- ✅ Checkout page ([/checkout](http://localhost:3000/checkout))
+- ✅ AddressForm component with validation
+- ✅ Address selection UI
+- ✅ Order summary with breakdown
+- ✅ Mock payment processing
+- ✅ Order details page ([/orders/:id](http://localhost:3000/orders/:id))
+- ✅ Order status display with color coding
+- ✅ Responsive layout
+
+**Features:**
+- Save multiple delivery addresses
+- Set/change default address
+- Real-time form validation
+- Order total calculation
+- Mock webhook simulation
+- Order confirmation with details
+- Estimated delivery time (25 mins)
+
 ## 🚧 In Progress
 
 Nothing currently in progress.
 
 ## 📋 Up Next
 
-### Phase 3: Checkout & Payments (Next)
+### Phase 4: Real-time Order Tracking (Next)
 **Backend:**
 - [ ] GET `/api/products` - List products with filters (category, search, store)
 - [ ] GET `/api/products/:id` - Get product details
@@ -172,10 +209,10 @@ Nothing currently in progress.
 
 ## 📊 Progress Metrics
 
-- **Phases completed:** 2/6 (33%)
-- **Estimated time to MVP:** 2-4 weeks
-- **Lines of code:** ~3,000+ (backend + frontend)
-- **API endpoints:** 6 endpoints complete (3 auth + 3 products)
+- **Phases completed:** 3/6 (50% - Halfway to MVP!) 🎉
+- **Estimated time to MVP:** 1-3 weeks
+- **Lines of code:** ~5,000+ (backend + frontend)
+- **API endpoints:** 13 endpoints complete (3 auth + 3 products + 4 addresses + 3 orders)
 
 ## 🧪 Testing Instructions
 
