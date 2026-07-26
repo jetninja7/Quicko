@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-import { authenticate, AuthRequest } from '../middleware/auth.middleware';
+import { authenticate, AuthRequest, authorize } from '../middleware/auth.middleware';
 import { createPaymentIntent } from '../services/stripe.service';
+import { wsService } from '../services/websocket.service';
+import { UserRole } from '@quicko/shared-types';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -17,7 +19,11 @@ const createOrderSchema = z.object({
   addressId: z.string(),
 });
 
-const TAX_RATE = 0.0875; // 8.75% (California rate)
+const updateStatusSchema = z.object({
+  status: z.enum(['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED']),
+});
+
+const TAX_RATE = 0.0875;
 const DELIVERY_FEE = 4.99;
 
 router.use(authenticate);
@@ -146,6 +152,71 @@ router.post('/', async (req: AuthRequest, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to create order',
+    });
+  }
+});
+
+router.patch('/:id/status', authorize(UserRole.ADMIN, UserRole.STORE_MANAGER, UserRole.DELIVERY_DRIVER), async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = updateStatusSchema.parse(req.body);
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        items: true,
+        address: true,
+        store: true,
+      },
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: 'Order not found',
+      });
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id },
+      data: {
+        status,
+        ...(status === 'DELIVERED' && {
+          actualDeliveryTime: new Date(),
+        }),
+      },
+      include: {
+        items: true,
+        address: true,
+        store: true,
+        payment: true,
+      },
+    });
+
+    wsService.broadcastOrderUpdate(id, {
+      orderId: id,
+      status: updatedOrder.status,
+      estimatedDeliveryTime: updatedOrder.estimatedDeliveryTime,
+      actualDeliveryTime: updatedOrder.actualDeliveryTime,
+      timestamp: new Date(),
+    });
+
+    res.json({
+      success: true,
+      data: updatedOrder,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: error.errors[0].message,
+      });
+    }
+
+    console.error('Update order status error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update order status',
     });
   }
 });

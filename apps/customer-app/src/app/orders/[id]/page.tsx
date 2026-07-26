@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useOrderTracking } from '@/hooks/useOrderTracking';
+import { OrderTimeline } from '@/components/OrderTimeline';
 
 interface Order {
   id: string;
@@ -12,6 +14,7 @@ interface Order {
   total: number;
   createdAt: string;
   estimatedDeliveryTime?: string;
+  actualDeliveryTime?: string;
   items: Array<{
     productName: string;
     quantity: number;
@@ -38,9 +41,23 @@ export default function OrderDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const { isConnected, lastUpdate } = useOrderTracking(orderId, token);
+
   useEffect(() => {
     fetchOrder();
   }, [orderId]);
+
+  useEffect(() => {
+    if (lastUpdate && order) {
+      setOrder({
+        ...order,
+        status: lastUpdate.status,
+        estimatedDeliveryTime: lastUpdate.estimatedDeliveryTime,
+        actualDeliveryTime: lastUpdate.actualDeliveryTime,
+      });
+    }
+  }, [lastUpdate]);
 
   async function fetchOrder() {
     try {
@@ -153,17 +170,23 @@ export default function OrderDetailsPage() {
               </span>
             </div>
 
-            {order.status === 'CONFIRMED' && order.estimatedDeliveryTime && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                <p className="text-green-800 font-semibold mb-1">
-                  🎉 Order Confirmed!
-                </p>
-                <p className="text-green-700 text-sm">
-                  Estimated delivery:{' '}
-                  {new Date(order.estimatedDeliveryTime).toLocaleTimeString()}
+            {isConnected && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+                <p className="text-xs text-blue-800">
+                  🔴 Live tracking active
                 </p>
               </div>
             )}
+
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-900 mb-4">Order Status</h3>
+              <OrderTimeline
+                currentStatus={order.status}
+                createdAt={order.createdAt}
+                estimatedDeliveryTime={order.estimatedDeliveryTime}
+                actualDeliveryTime={order.actualDeliveryTime}
+              />
+            </div>
 
             <div className="border-t pt-6">
               <h3 className="font-bold text-gray-900 mb-4">Order Items</h3>

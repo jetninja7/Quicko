@@ -2,12 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
 import authRoutes from './routes/auth.routes';
 import productsRoutes from './routes/products.routes';
 import categoriesRoutes from './routes/categories.routes';
 import addressesRoutes from './routes/addresses.routes';
 import ordersRoutes from './routes/orders.routes';
 import webhooksRoutes from './routes/webhooks.routes';
+import { wsService } from './services/websocket.service';
 
 dotenv.config();
 
@@ -34,7 +36,11 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/addresses', addressesRoutes);
 app.use('/api/orders', ordersRoutes);
 
-app.listen(PORT, () => {
+const server = createServer(app);
+
+wsService.initialize(server);
+
+server.listen(PORT, () => {
   console.log(`🚀 Quicko Backend running on port ${PORT}`);
   console.log(`📍 API endpoints:`);
   console.log(`   - Health: http://localhost:${PORT}/health`);
@@ -44,4 +50,5 @@ app.listen(PORT, () => {
   console.log(`   - Addresses: http://localhost:${PORT}/api/addresses`);
   console.log(`   - Orders: http://localhost:${PORT}/api/orders`);
   console.log(`   - Webhooks: http://localhost:${PORT}/api/webhooks/stripe`);
+  console.log(`   - WebSocket: ws://localhost:${PORT}/ws`);
 });
