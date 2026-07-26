@@ -53,13 +53,18 @@ export default function Home() {
           </p>
 
           {isAuthenticated && user ? (
-            <div className="space-y-4">
-              <div className="inline-block px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold shadow-lg">
-                ✅ You're logged in as {user.phoneNumber}
+            <div className="space-y-6">
+              <div className="inline-block px-8 py-4 bg-white border-2 border-primary-600 text-primary-600 rounded-lg font-semibold shadow-lg">
+                ✅ Welcome, {user.firstName || user.phoneNumber}!
               </div>
-              <p className="text-gray-600">
-                Product catalog coming soon!
-              </p>
+              <div>
+                <button
+                  onClick={() => router.push('/products')}
+                  className="inline-block px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-lg"
+                >
+                  Browse Products →
+                </button>
+              </div>
             </div>
           ) : (
             <button

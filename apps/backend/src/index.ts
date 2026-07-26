@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
+import productsRoutes from './routes/products.routes';
+import categoriesRoutes from './routes/categories.routes';
 
 dotenv.config();
 
@@ -21,10 +23,14 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/categories', categoriesRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Quicko Backend running on port ${PORT}`);
   console.log(`📍 API endpoints:`);
   console.log(`   - Health: http://localhost:${PORT}/health`);
   console.log(`   - Auth: http://localhost:${PORT}/api/auth/*`);
+  console.log(`   - Products: http://localhost:${PORT}/api/products`);
+  console.log(`   - Categories: http://localhost:${PORT}/api/categories`);
 });
