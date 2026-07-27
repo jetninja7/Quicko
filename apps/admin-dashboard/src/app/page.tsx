@@ -138,32 +138,38 @@ export default function AdminDashboard() {
                 </p>
               </button>
 
-              <div className="bg-white rounded-xl shadow-md p-8 opacity-50 text-left">
+              <button
+                onClick={() => router.push('/products')}
+                className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow text-left"
+              >
                 <div className="text-4xl mb-4">🛒</div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Products</h2>
                 <p className="text-gray-600">
                   Add, edit, and manage product inventory
                 </p>
-                <p className="text-xs text-gray-400 mt-2">Coming soon</p>
-              </div>
+              </button>
 
-              <div className="bg-white rounded-xl shadow-md p-8 opacity-50 text-left">
+              <button
+                onClick={() => router.push('/users')}
+                className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow text-left"
+              >
                 <div className="text-4xl mb-4">👥</div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Users</h2>
                 <p className="text-gray-600">
                   View customers, drivers, and team members
                 </p>
-                <p className="text-xs text-gray-400 mt-2">Coming soon</p>
-              </div>
+              </button>
 
-              <div className="bg-white rounded-xl shadow-md p-8 opacity-50 text-left">
+              <button
+                onClick={() => router.push('/analytics')}
+                className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow text-left"
+              >
                 <div className="text-4xl mb-4">📊</div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Analytics</h2>
                 <p className="text-gray-600">
                   View sales reports and performance metrics
                 </p>
-                <p className="text-xs text-gray-400 mt-2">Coming soon</p>
-              </div>
+              </button>
             </div>
           </>
         )}
