@@ -10,6 +10,7 @@ import addressesRoutes from './routes/addresses.routes';
 import ordersRoutes from './routes/orders.routes';
 import webhooksRoutes from './routes/webhooks.routes';
 import driverRoutes from './routes/driver.routes';
+import adminRoutes from './routes/admin.routes';
 import { wsService } from './services/websocket.service';
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/addresses', addressesRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/driver', driverRoutes);
+app.use('/api/admin', adminRoutes);
 
 const server = createServer(app);
 
@@ -52,6 +54,7 @@ server.listen(PORT, () => {
   console.log(`   - Addresses: http://localhost:${PORT}/api/addresses`);
   console.log(`   - Orders: http://localhost:${PORT}/api/orders`);
   console.log(`   - Driver: http://localhost:${PORT}/api/driver`);
+  console.log(`   - Admin: http://localhost:${PORT}/api/admin`);
   console.log(`   - Webhooks: http://localhost:${PORT}/api/webhooks/stripe`);
   console.log(`   - WebSocket: ws://localhost:${PORT}/ws`);
 });
