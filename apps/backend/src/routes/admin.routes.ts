@@ -87,12 +87,22 @@ router.get('/orders', async (req: AuthRequest, res) => {
   try {
     const { status, page = '1', limit = '20' } = req.query;
 
+    const pageNum = parseInt(page as string, 10);
+    const limitNum = parseInt(limit as string, 10);
+
+    if (isNaN(pageNum) || pageNum < 1) {
+      return res.status(400).json({ success: false, error: 'Invalid page number' });
+    }
+    if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+      return res.status(400).json({ success: false, error: 'Invalid limit (must be 1-100)' });
+    }
+
     const where: any = {};
     if (status) {
       where.status = status;
     }
 
-    const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+    const skip = (pageNum - 1) * limitNum;
 
     const [orders, total] = await Promise.all([
       prisma.order.findMany({
@@ -121,7 +131,7 @@ router.get('/orders', async (req: AuthRequest, res) => {
         },
         orderBy: { createdAt: 'desc' },
         skip,
-        take: parseInt(limit as string),
+        take: limitNum,
       }),
       prisma.order.count({ where }),
     ]);
@@ -131,8 +141,8 @@ router.get('/orders', async (req: AuthRequest, res) => {
       data: {
         items: orders,
         total,
-        page: parseInt(page as string),
-        pageSize: parseInt(limit as string),
+        page: pageNum,
+        pageSize: limitNum,
         hasMore: skip + orders.length < total,
       },
     });
@@ -148,31 +158,53 @@ router.get('/orders', async (req: AuthRequest, res) => {
 // All Users
 router.get('/users', async (req: AuthRequest, res) => {
   try {
-    const { role } = req.query;
+    const { role, page = '1', limit = '50' } = req.query;
+
+    const pageNum = parseInt(page as string, 10);
+    const limitNum = parseInt(limit as string, 10);
+
+    if (isNaN(pageNum) || pageNum < 1) {
+      return res.status(400).json({ success: false, error: 'Invalid page number' });
+    }
+    if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+      return res.status(400).json({ success: false, error: 'Invalid limit (must be 1-100)' });
+    }
 
     const where: any = {};
     if (role) {
       where.role = role;
     }
 
-    const users = await prisma.user.findMany({
-      where,
-      select: {
-        id: true,
-        phoneNumber: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    });
+    const skip = (pageNum - 1) * limitNum;
+
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          phoneNumber: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          role: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limitNum,
+      }),
+      prisma.user.count({ where }),
+    ]);
 
     res.json({
       success: true,
-      data: users,
+      data: {
+        items: users,
+        total,
+        page: pageNum,
+        pageSize: limitNum,
+        hasMore: skip + users.length < total,
+      },
     });
   } catch (error) {
     console.error('Get users error:', error);
@@ -228,6 +260,14 @@ router.patch('/products/:id', async (req: AuthRequest, res) => {
     const { id } = req.params;
     const data = productSchema.partial().parse(req.body);
 
+    const existing = await prisma.product.findUnique({ where: { id } });
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        error: 'Product not found',
+      });
+    }
+
     const product = await prisma.product.update({
       where: { id },
       data,
@@ -256,6 +296,14 @@ router.patch('/products/:id', async (req: AuthRequest, res) => {
 router.delete('/products/:id', async (req: AuthRequest, res) => {
   try {
     const { id } = req.params;
+
+    const existing = await prisma.product.findUnique({ where: { id } });
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        error: 'Product not found',
+      });
+    }
 
     await prisma.product.delete({
       where: { id },

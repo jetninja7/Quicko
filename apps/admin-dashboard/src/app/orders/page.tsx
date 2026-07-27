@@ -51,6 +51,12 @@ export default function OrdersPage() {
         }
       );
 
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        router.push('/login');
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -122,7 +128,7 @@ export default function OrdersPage() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {status.replace('_', ' ')}
+                  {status.replaceAll('_', ' ')}
                 </button>
               )
             )}
