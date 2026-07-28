@@ -1,0 +1,59 @@
+# Stripe API Keys - Keep this file secure!
+
+## Test Mode Keys (for development/testing)
+
+Publishable Key (Frontend):
+pk_test_...
+[Paste your key here]
+
+Secret Key (Backend):
+sk_test_...
+[Paste your key here]
+
+Webhook Secret (will get this later):
+whsec_...
+[Leave blank for now]
+
+---
+
+## Where to Use These:
+
+### Railway (Backend)
+Add to Variables tab:
+- STRIPE_SECRET_KEY = sk_test_...
+
+### Vercel (Customer App)
+Add environment variable:
+- NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = pk_test_...
+
+---
+
+## Live Mode (when you're ready to go live)
+
+You'll switch to live keys:
+- pk_live_...
+- sk_live_...
+
+But for now, use test keys!
+
+---
+
+## Getting Webhook Secret (Step 3 - after backend is deployed)
+
+1. Go to: https://dashboard.stripe.com/webhooks
+2. Click "Add endpoint"
+3. Endpoint URL: https://your-railway-backend-url.railway.app/api/webhooks/stripe
+4. Select events:
+   - payment_intent.succeeded
+   - payment_intent.payment_failed
+5. Copy the "Signing secret" (whsec_...)
+6. Add to Railway variables as STRIPE_WEBHOOK_SECRET
+
+---
+
+## Test Cards (for testing payments)
+
+Success: 4242 4242 4242 4242
+Decline: 4000 0000 0000 0002
+
+Any future expiry date, any 3-digit CVC
