@@ -114,7 +114,7 @@ export default function AdminLoginPage() {
                 </label>
                 <input
                   type="tel"
-                  value={phoneNumber}
+                  value={phoneNumber.replace(/^\+1/, '').replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}
                   onChange={(e) => {
                     const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
                     setPhoneNumber(digits ? `+1${digits}` : '');
