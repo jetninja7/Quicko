@@ -11,14 +11,23 @@ interface Product {
   unit: string;
   availableStock: number;
   imageUrl?: string;
+  storeId: string;
   store: {
+    id: string;
     name: string;
   };
+}
+
+interface Store {
+  id: string;
+  name: string;
+  city: string;
 }
 
 export default function ProductsPage() {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
+  const [stores, setStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -34,6 +43,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchProducts();
+    fetchStores();
   }, []);
 
   async function fetchProducts() {
@@ -63,6 +73,24 @@ export default function ProductsPage() {
     }
   }
 
+  async function fetchStores() {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/stores`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStores(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch stores:', err);
+    }
+  }
+
   function openCreateModal() {
     setEditingProduct(null);
     setFormData({
@@ -72,7 +100,7 @@ export default function ProductsPage() {
       unit: '',
       availableStock: '',
       imageUrl: '',
-      storeId: '',
+      storeId: stores[0]?.id || '',
     });
     setShowModal(true);
   }
@@ -86,13 +114,18 @@ export default function ProductsPage() {
       unit: product.unit,
       availableStock: product.availableStock.toString(),
       imageUrl: product.imageUrl || '',
-      storeId: '',
+      storeId: product.storeId,
     });
     setShowModal(true);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!formData.storeId) {
+      alert('Please select a store');
+      return;
+    }
 
     const payload = {
       name: formData.name,
@@ -101,7 +134,7 @@ export default function ProductsPage() {
       unit: formData.unit,
       availableStock: parseInt(formData.availableStock),
       imageUrl: formData.imageUrl || undefined,
-      storeId: formData.storeId || undefined,
+      storeId: formData.storeId,
     };
 
     try {
@@ -314,6 +347,25 @@ export default function ProductsPage() {
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Store <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.storeId}
+                  onChange={(e) => setFormData({ ...formData, storeId: e.target.value })}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">Select a store</option>
+                  {stores.map((store) => (
+                    <option key={store.id} value={store.id}>
+                      {store.name} - {store.city}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>

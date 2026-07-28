@@ -155,6 +155,35 @@ router.get('/orders', async (req: AuthRequest, res) => {
   }
 });
 
+// All Stores
+router.get('/stores', async (req: AuthRequest, res) => {
+  try {
+    const stores = await prisma.store.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        street: true,
+        city: true,
+        state: true,
+        zipCode: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    res.json({
+      success: true,
+      data: stores,
+    });
+  } catch (error) {
+    console.error('Get stores error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch stores',
+    });
+  }
+});
+
 // All Users
 router.get('/users', async (req: AuthRequest, res) => {
   try {
