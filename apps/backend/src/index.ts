@@ -11,6 +11,7 @@ import ordersRoutes from './routes/orders.routes';
 import webhooksRoutes from './routes/webhooks.routes';
 import driverRoutes from './routes/driver.routes';
 import adminRoutes from './routes/admin.routes';
+import inventoryRoutes from './routes/inventory.routes';
 import { wsService } from './services/websocket.service';
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.use('/api/addresses', addressesRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/driver', driverRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 const server = createServer(app);
 

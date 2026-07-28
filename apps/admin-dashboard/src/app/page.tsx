@@ -170,6 +170,17 @@ export default function AdminDashboard() {
                   View sales reports and performance metrics
                 </p>
               </button>
+
+              <button
+                onClick={() => router.push('/inventory')}
+                className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow text-left"
+              >
+                <div className="text-4xl mb-4">📦</div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Inventory</h2>
+                <p className="text-gray-600">
+                  Monitor stock levels and low stock alerts
+                </p>
+              </button>
             </div>
           </>
         )}
