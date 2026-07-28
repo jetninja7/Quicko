@@ -21,8 +21,21 @@ model User {
   deliveredOrders  Order[]          @relation("DeliveryDriverOrders")
   addresses        Address[]
   paymentMethods   PaymentMethod[]
+  favoriteProducts FavoriteProduct[]
 
   @@index([phoneNumber])
+}
+
+model FavoriteProduct {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
 }
 
 enum UserRole {
