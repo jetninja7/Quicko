@@ -1,0 +1,4 @@
+# Ignore frontend apps when deploying backend
+apps/customer-app/
+apps/delivery-app/
+apps/admin-dashboard/
