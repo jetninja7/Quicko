@@ -44,21 +44,27 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/favorites', favoritesRoutes);
 
-const server = createServer(app);
+// For Vercel serverless, export the app
+export default app;
 
-wsService.initialize(server);
+// For local development and traditional hosting
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+  const server = createServer(app);
 
-server.listen(PORT, () => {
-  console.log(`🚀 Quicko Backend running on port ${PORT}`);
-  console.log(`📍 API endpoints:`);
-  console.log(`   - Health: http://localhost:${PORT}/health`);
-  console.log(`   - Auth: http://localhost:${PORT}/api/auth/*`);
-  console.log(`   - Products: http://localhost:${PORT}/api/products`);
-  console.log(`   - Categories: http://localhost:${PORT}/api/categories`);
-  console.log(`   - Addresses: http://localhost:${PORT}/api/addresses`);
-  console.log(`   - Orders: http://localhost:${PORT}/api/orders`);
-  console.log(`   - Driver: http://localhost:${PORT}/api/driver`);
-  console.log(`   - Admin: http://localhost:${PORT}/api/admin`);
-  console.log(`   - Webhooks: http://localhost:${PORT}/api/webhooks/stripe`);
-  console.log(`   - WebSocket: ws://localhost:${PORT}/ws`);
-});
+  wsService.initialize(server);
+
+  server.listen(PORT, () => {
+    console.log(`🚀 Quicko Backend running on port ${PORT}`);
+    console.log(`📍 API endpoints:`);
+    console.log(`   - Health: http://localhost:${PORT}/health`);
+    console.log(`   - Auth: http://localhost:${PORT}/api/auth/*`);
+    console.log(`   - Products: http://localhost:${PORT}/api/products`);
+    console.log(`   - Categories: http://localhost:${PORT}/api/categories`);
+    console.log(`   - Addresses: http://localhost:${PORT}/api/addresses`);
+    console.log(`   - Orders: http://localhost:${PORT}/api/orders`);
+    console.log(`   - Driver: http://localhost:${PORT}/api/driver`);
+    console.log(`   - Admin: http://localhost:${PORT}/api/admin`);
+    console.log(`   - Webhooks: http://localhost:${PORT}/api/webhooks/stripe`);
+    console.log(`   - WebSocket: ws://localhost:${PORT}/ws`);
+  });
+}
