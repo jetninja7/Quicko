@@ -33,9 +33,10 @@ export async function sendOTP(phoneNumber: string): Promise<void> {
     },
   });
 
-  if (process.env.NODE_ENV === 'development') {
+  // Always log OTP if Twilio is not configured
+  if (!twilioClient) {
     console.log(`📱 OTP for ${phoneNumber}: ${code}`);
-    console.log('💡 In development, use code "000000" to bypass OTP verification');
+    console.log('💡 Use code "123456" to bypass OTP verification');
   }
 
   if (twilioClient) {
@@ -53,8 +54,9 @@ export async function sendOTP(phoneNumber: string): Promise<void> {
 }
 
 export async function verifyOTP(phoneNumber: string, code: string): Promise<boolean> {
-  if (process.env.NODE_ENV === 'development' && code === '000000') {
-    console.log('✅ Development bypass code used');
+  // Bypass code works when Twilio is not configured
+  if (!twilioClient && code === '123456') {
+    console.log('✅ Bypass code used (Twilio not configured)');
     return true;
   }
 
