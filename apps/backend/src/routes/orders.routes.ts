@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { authenticate, AuthRequest, authorize } from '../middleware/auth.middleware';
 import { createPaymentIntent } from '../services/stripe.service';
 import { wsService } from '../services/websocket.service';
-import { UserRole } from '@quicko/shared-types';
+import { UserRole } from '../types/shared';
 
 const router = Router();
 const prisma = new PrismaClient();

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
-import { AuthTokenPayload, UserRole } from '@quicko/shared-types';
+import { AuthTokenPayload, UserRole } from '../types/shared';
 
 export interface AuthRequest extends Request {
   user?: AuthTokenPayload;

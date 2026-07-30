@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authenticate, AuthRequest, authorize } from '../middleware/auth.middleware';
-import { UserRole } from '@quicko/shared-types';
+import { UserRole } from '../types/shared';
 import { wsService } from '../services/websocket.service';
 
 const router = Router();
