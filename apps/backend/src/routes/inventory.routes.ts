@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { authenticate, AuthRequest, authorize } from '../middleware/auth.middleware';
 import { UserRole } from '../types/shared';
 
