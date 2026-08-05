@@ -57,6 +57,7 @@ describe('Auth API', () => {
 
     it('should accept dev bypass code in development', async () => {
       process.env.NODE_ENV = 'development';
+      process.env.OTP_BYPASS_CODE = '000000';
 
       const response = await request(app)
         .post('/api/auth/verify-otp')
