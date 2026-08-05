@@ -106,6 +106,14 @@ router.patch('/stock/:productId', async (req: AuthRequest, res) => {
     const { productId } = req.params;
     const { quantity, operation } = req.body;
 
+    const qty = Number(quantity);
+    if (!Number.isFinite(qty) || qty < 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Quantity must be a non-negative number',
+      });
+    }
+
     if (!['add', 'subtract', 'set'].includes(operation)) {
       return res.status(400).json({
         success: false,
