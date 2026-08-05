@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { authenticate, AuthRequest, authorize } from '../middleware/auth.middleware';
-import { UserRole } from '@quicko/shared-types';
+import { UserRole } from '../types/shared';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -151,6 +151,35 @@ router.get('/orders', async (req: AuthRequest, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch orders',
+    });
+  }
+});
+
+// All Stores
+router.get('/stores', async (req: AuthRequest, res) => {
+  try {
+    const stores = await prisma.store.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        street: true,
+        city: true,
+        state: true,
+        zipCode: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    res.json({
+      success: true,
+      data: stores,
+    });
+  } catch (error) {
+    console.error('Get stores error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch stores',
     });
   }
 });

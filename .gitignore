@@ -40,3 +40,4 @@ docker-compose.override.yml
 *.db
 *.db-journal
 prisma/migrations/**/migration.sql
+STRIPE_KEYS.txt

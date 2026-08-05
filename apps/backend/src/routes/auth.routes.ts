@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { sendOTP, verifyOTP } from '../services/otp.service';
 import { signToken } from '../utils/jwt';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
-import { UserRole } from '@quicko/shared-types';
+import { UserRole } from '../types/shared';
 
 const router = Router();
 const prisma = new PrismaClient();

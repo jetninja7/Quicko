@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { authenticate, AuthRequest, authorize } from '../middleware/auth.middleware';
 import { createPaymentIntent } from '../services/stripe.service';
 import { wsService } from '../services/websocket.service';
-import { UserRole } from '@quicko/shared-types';
+import { UserRole } from '../types/shared';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -280,6 +280,73 @@ router.get('/:id', async (req: AuthRequest, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch order',
+    });
+  }
+});
+
+// Reorder - Create new order from previous order
+router.post('/:id/reorder', authenticate, async (req: AuthRequest, res) => {
+  try {
+    const { id: orderId } = req.params;
+
+    const originalOrder = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
+
+    if (!originalOrder) {
+      return res.status(404).json({
+        success: false,
+        error: 'Order not found',
+      });
+    }
+
+    if (originalOrder.customerId !== req.user!.userId) {
+      return res.status(403).json({
+        success: false,
+        error: 'Not authorized',
+      });
+    }
+
+    const subtotal = originalOrder.subtotal;
+    const tax = originalOrder.tax;
+    const deliveryFee = originalOrder.deliveryFee;
+    const total = subtotal + tax + deliveryFee;
+
+    const newOrder = await prisma.order.create({
+      data: {
+        customerId: req.user!.userId,
+        storeId: originalOrder.storeId,
+        subtotal,
+        tax,
+        deliveryFee,
+        total,
+        status: 'PENDING',
+        estimatedDeliveryAt: new Date(Date.now() + 25 * 60 * 1000),
+        items: {
+          create: originalOrder.items.map((item) => ({
+            productName: item.productName,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            subtotal: item.subtotal,
+          })),
+        },
+      },
+      include: {
+        items: true,
+        store: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      data: newOrder,
+    });
+  } catch (error) {
+    console.error('Reorder error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create reorder',
     });
   }
 });

@@ -21,8 +21,21 @@ model User {
   deliveredOrders  Order[]          @relation("DeliveryDriverOrders")
   addresses        Address[]
   paymentMethods   PaymentMethod[]
+  favoriteProducts FavoriteProduct[]
 
   @@index([phoneNumber])
+}
+
+model FavoriteProduct {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
 }
 
 enum UserRole {
@@ -64,17 +77,18 @@ model Store {
 }
 
 model Product {
-  id             String   @id @default(cuid())
-  name           String
-  description    String?
-  category       String
-  imageUrl       String?
-  price          Float
-  unit           String
-  availableStock Int
-  storeId        String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  name               String
+  description        String?
+  category           String
+  imageUrl           String?
+  price              Float
+  unit               String
+  availableStock     Int
+  lowStockThreshold  Int      @default(10)
+  storeId            String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   store      Store       @relation(fields: [storeId], references: [id])
   orderItems OrderItem[]
