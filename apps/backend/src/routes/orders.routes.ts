@@ -291,7 +291,7 @@ router.post('/:id/reorder', authenticate, async (req: AuthRequest, res) => {
 
     const originalOrder = await prisma.order.findUnique({
       where: { id: orderId },
-      include: { items: true },
+      include: { items: true, store: true },
     });
 
     if (!originalOrder) {
@@ -308,28 +308,82 @@ router.post('/:id/reorder', authenticate, async (req: AuthRequest, res) => {
       });
     }
 
-    const subtotal = originalOrder.subtotal;
-    const tax = originalOrder.tax;
-    const deliveryFee = originalOrder.deliveryFee;
+    // Validate store is still active
+    if (!originalOrder.store.isActive) {
+      return res.status(400).json({
+        success: false,
+        error: 'Store is no longer active',
+      });
+    }
+
+    // Revalidate products: check stock and get current prices
+    const productIds = originalOrder.items.map((item) => item.productId);
+    const currentProducts = await prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        storeId: originalOrder.storeId,
+      },
+    });
+
+    // Check if all products still exist and have sufficient stock
+    const unavailableItems: string[] = [];
+    const outOfStockItems: string[] = [];
+
+    for (const item of originalOrder.items) {
+      const currentProduct = currentProducts.find((p) => p.id === item.productId);
+      if (!currentProduct) {
+        unavailableItems.push(item.productName);
+      } else if (currentProduct.availableStock < item.quantity) {
+        outOfStockItems.push(`${item.productName} (available: ${currentProduct.availableStock}, need: ${item.quantity})`);
+      }
+    }
+
+    if (unavailableItems.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: `Products no longer available: ${unavailableItems.join(', ')}`,
+      });
+    }
+
+    if (outOfStockItems.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: `Insufficient stock: ${outOfStockItems.join(', ')}`,
+      });
+    }
+
+    // Recalculate prices with current product prices
+    let subtotal = 0;
+    const itemsWithCurrentPrices = originalOrder.items.map((item) => {
+      const currentProduct = currentProducts.find((p) => p.id === item.productId)!;
+      const itemTotal = currentProduct.price * item.quantity;
+      subtotal += itemTotal;
+      return {
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: currentProduct.price,
+        total: itemTotal,
+      };
+    });
+
+    const tax = subtotal * 0.0875; // 8.75% tax
+    const deliveryFee = 4.99;
     const total = subtotal + tax + deliveryFee;
 
     const newOrder = await prisma.order.create({
       data: {
         customerId: req.user!.userId,
         storeId: originalOrder.storeId,
+        addressId: originalOrder.addressId,
         subtotal,
         tax,
         deliveryFee,
         total,
         status: 'PENDING',
-        estimatedDeliveryAt: new Date(Date.now() + 25 * 60 * 1000),
+        estimatedDeliveryTime: new Date(Date.now() + 25 * 60 * 1000),
         items: {
-          create: originalOrder.items.map((item) => ({
-            productName: item.productName,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            subtotal: item.subtotal,
-          })),
+          create: itemsWithCurrentPrices,
         },
       },
       include: {

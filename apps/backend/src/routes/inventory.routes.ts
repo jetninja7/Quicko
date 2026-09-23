@@ -14,17 +14,7 @@ router.get('/low-stock', async (req: AuthRequest, res) => {
   try {
     const { storeId } = req.query;
 
-    const where: any = {
-      availableStock: {
-        lte: prisma.raw('CAST("lowStockThreshold" AS INTEGER)'),
-      },
-    };
-
-    if (storeId) {
-      where.storeId = storeId;
-    }
-
-    const lowStockProducts = await prisma.$queryRaw`
+    const lowStockProducts = await prisma.$queryRaw<any[]>`
       SELECT
         p.id,
         p.name,
@@ -38,7 +28,7 @@ router.get('/low-stock', async (req: AuthRequest, res) => {
       FROM "Product" p
       JOIN "Store" s ON p."storeId" = s.id
       WHERE p."availableStock" <= p."lowStockThreshold"
-      ${storeId ? prisma.raw`AND p."storeId" = ${storeId}` : prisma.raw``}
+      ${storeId ? Prisma.sql`AND p."storeId" = ${storeId}` : Prisma.empty}
       ORDER BY (p."lowStockThreshold" - p."availableStock") DESC
     `;
 
@@ -46,7 +36,7 @@ router.get('/low-stock', async (req: AuthRequest, res) => {
       success: true,
       data: {
         products: lowStockProducts,
-        count: (lowStockProducts as any[]).length,
+        count: lowStockProducts.length,
       },
     });
   } catch (error) {
@@ -121,51 +111,59 @@ router.patch('/stock/:productId', async (req: AuthRequest, res) => {
       });
     }
 
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
-    });
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        error: 'Product not found',
+    // Use transaction to prevent concurrent write loss
+    const updatedProduct = await prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id: productId },
       });
-    }
 
-    let newStock: number;
+      if (!product) {
+        throw new Error('Product not found');
+      }
 
-    switch (operation) {
-      case 'add':
-        newStock = product.availableStock + quantity;
-        break;
-      case 'subtract':
-        newStock = Math.max(0, product.availableStock - quantity);
-        break;
-      case 'set':
-        newStock = Math.max(0, quantity);
-        break;
-      default:
-        newStock = product.availableStock;
-    }
+      let newStock: number;
 
-    const updatedProduct = await prisma.product.update({
-      where: { id: productId },
-      data: { availableStock: newStock },
-      include: {
-        store: {
-          select: {
-            name: true,
+      switch (operation) {
+        case 'add':
+          newStock = product.availableStock + qty;
+          break;
+        case 'subtract':
+          newStock = Math.max(0, product.availableStock - qty);
+          break;
+        case 'set':
+          newStock = Math.max(0, qty);
+          break;
+        default:
+          newStock = product.availableStock;
+      }
+
+      return await tx.product.update({
+        where: { id: productId },
+        data: { availableStock: newStock },
+        include: {
+          store: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
+      });
     });
 
     res.json({
       success: true,
       data: updatedProduct,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update stock error:', error);
+
+    if (error.message === 'Product not found') {
+      return res.status(404).json({
+        success: false,
+        error: 'Product not found',
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: 'Failed to update stock',

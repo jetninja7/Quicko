@@ -44,7 +44,7 @@
 
 ```
 DATABASE_URL=<paste the PostgreSQL URL from step A>
-JWT_SECRET=<generate random string - use: openssl rand -base64 32>
+JWT_SECRET=<generate random string - use: openssl rand -base64 64>
 JWT_EXPIRES_IN=7d
 STRIPE_SECRET_KEY=<your sk_... key from Step 1>
 STRIPE_WEBHOOK_SECRET=<leave blank for now>
@@ -52,6 +52,11 @@ NODE_ENV=production
 PORT=4000
 ALLOWED_ORIGINS=https://quicko-customer.vercel.app,https://quicko-driver.vercel.app,https://quicko-admin.vercel.app
 ```
+
+**⚠️ SECURITY WARNING:** 
+- **NEVER** use placeholder/example values for JWT_SECRET in production
+- **ALWAYS** generate a new random secret using the openssl command above
+- Compromised JWT secrets allow attackers to forge authentication tokens
 
 4. Click "Deploy" again to restart with new variables
 5. Wait for deployment (2-3 minutes)
