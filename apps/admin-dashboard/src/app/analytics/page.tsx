@@ -12,7 +12,7 @@ interface RecentOrder {
     phoneNumber: string;
     firstName?: string;
   };
-  items: Array<{
+  items?: Array<{
     productName: string;
     quantity: number;
   }>;
@@ -229,7 +229,7 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="text-sm text-gray-600">
                           {order.customer.firstName || order.customer.phoneNumber} •{' '}
-                          {order.items.length} item(s) •{' '}
+                          {order.items?.length ?? 0} item(s) •{' '}
                           {new Date(order.createdAt).toLocaleTimeString()}
                         </div>
                       </div>
