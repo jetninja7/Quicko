@@ -183,20 +183,18 @@ router.get('/report', async (req: AuthRequest, res) => {
 
     const [
       totalProducts,
-      lowStockCount,
+      lowStockCountResult,
       outOfStockCount,
       totalStockValue,
       productsByCategory,
     ] = await Promise.all([
       prisma.product.count({ where }),
-      prisma.product.count({
-        where: {
-          ...where,
-          availableStock: {
-            lte: 10, // Using default threshold
-          },
-        },
-      }),
+      prisma.$queryRaw<{ count: bigint }[]>(Prisma.sql`
+        SELECT COUNT(*)::bigint as count
+        FROM "Product" p
+        WHERE p."availableStock" <= p."lowStockThreshold"
+        ${storeId ? Prisma.sql`AND p."storeId" = ${storeId}` : Prisma.empty}
+      `),
       prisma.product.count({
         where: {
           ...where,
@@ -226,7 +224,7 @@ router.get('/report', async (req: AuthRequest, res) => {
       data: {
         summary: {
           totalProducts,
-          lowStockCount,
+          lowStockCount: Number(lowStockCountResult[0]?.count ?? 0),
           outOfStockCount,
           totalStockUnits: totalStockValue._sum.availableStock || 0,
         },
