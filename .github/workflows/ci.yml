@@ -78,14 +78,14 @@ jobs:
       - name: Install dependencies
         run: npm ci --include=optional
 
-      - name: Build all apps
-        run: npm run build --if-present
+      - name: Build backend only
+        run: |
+          cd apps/backend
+          npm run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: |
-            apps/*/dist
-            apps/*/.next
+          path: apps/backend/dist
           retention-days: 7
