@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth.store';
 
 interface Order {
   id: string;
@@ -22,20 +21,36 @@ interface Order {
 
 export default function OrderHistoryPage() {
   const router = useRouter();
-  const { token } = useAuthStore();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [reorderingId, setReorderingId] = useState<string | null>(null);
 
+  function getToken() {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    return localStorage.getItem('token');
+  }
+
   useEffect(() => {
+    const token = getToken();
+
     if (!token) {
       router.push('/auth/login');
       return;
     }
     fetchOrders();
-  }, [token, router]);
+  }, [router]);
 
   async function fetchOrders() {
+    const token = getToken();
+
+    if (!token) {
+      router.push('/auth/login');
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
         headers: {
@@ -56,6 +71,13 @@ export default function OrderHistoryPage() {
   }
 
   async function handleReorder(orderId: string) {
+    const token = getToken();
+
+    if (!token) {
+      router.push('/auth/login');
+      return;
+    }
+
     setReorderingId(orderId);
 
     try {

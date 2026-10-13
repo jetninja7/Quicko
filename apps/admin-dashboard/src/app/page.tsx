@@ -94,7 +94,7 @@ export default function AdminDashboard() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <div className="bg-white rounded-xl shadow-md p-6">
-                <div className="text-sm font-medium text-gray-600 mb-2">Today's Orders</div>
+                <div className="text-sm font-medium text-gray-600 mb-2">Today&apos;s Orders</div>
                 <div className="text-3xl font-bold text-purple-600">{stats?.todayOrders || 0}</div>
                 <div className="text-sm text-gray-500 mt-2">
                   ${(stats?.todayRevenue || 0).toFixed(2)} revenue

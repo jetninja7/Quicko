@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import twilio from 'twilio';
 
 const prisma = new PrismaClient();
 
@@ -9,12 +10,10 @@ const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
 let twilioClient: any = null;
 
 if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_PHONE_NUMBER) {
-  try {
-    const twilio = require('twilio');
-    twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-  } catch (error) {
-    console.warn('Twilio not configured. OTP will use development bypass mode.');
-  }
+  twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+  console.log('✅ Twilio initialized');
+} else {
+  console.warn('⚠️  Twilio not configured. OTP will use development bypass mode.');
 }
 
 function generateOTP(): string {
@@ -33,8 +32,8 @@ export async function sendOTP(phoneNumber: string): Promise<void> {
     },
   });
 
-  // Always log OTP if Twilio is not configured
-  if (!twilioClient) {
+  // Log OTP in development only
+  if (!twilioClient && process.env.NODE_ENV !== 'production') {
     console.log(`📱 OTP for ${phoneNumber}: ${code}`);
     console.log('💡 Use code "123456" to bypass OTP verification');
   }
@@ -54,9 +53,11 @@ export async function sendOTP(phoneNumber: string): Promise<void> {
 }
 
 export async function verifyOTP(phoneNumber: string, code: string): Promise<boolean> {
-  // Bypass code works when Twilio is not configured
+  // Bypass code works when Twilio is not configured (development/production)
   if (!twilioClient && code === '123456') {
-    console.log('✅ Bypass code used (Twilio not configured)');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ Bypass code used (Twilio not configured)');
+    }
     return true;
   }
 

@@ -64,7 +64,8 @@ export default function ProductsPage() {
       const data = await response.json();
 
       if (data.success) {
-        setProducts(data.data);
+        // Handle paginated response - extract items array
+        setProducts(data.data.items || data.data);
       }
     } catch (err) {
       console.error('Failed to fetch products:', err);

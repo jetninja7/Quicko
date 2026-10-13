@@ -12,7 +12,7 @@ interface RecentOrder {
     phoneNumber: string;
     firstName?: string;
   };
-  items: Array<{
+  items?: Array<{
     productName: string;
     quantity: number;
   }>;
@@ -137,7 +137,7 @@ export default function AnalyticsPage() {
 
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="text-sm font-medium text-gray-600 mb-2">
-                  Today's Revenue
+                  Today&apos;s Revenue
                 </div>
                 <div className="text-3xl font-bold text-green-600">
                   ${(stats?.todayRevenue || 0).toFixed(2)}
@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
 
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="text-sm font-medium text-gray-600 mb-2">
-                  Today's Average
+                  Today&apos;s Average
                 </div>
                 <div className="text-3xl font-bold text-orange-600">
                   ${todayAverage.toFixed(2)}
@@ -229,7 +229,7 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="text-sm text-gray-600">
                           {order.customer.firstName || order.customer.phoneNumber} •{' '}
-                          {order.items.length} item(s) •{' '}
+                          {order.items?.length ?? 0} item(s) •{' '}
                           {new Date(order.createdAt).toLocaleTimeString()}
                         </div>
                       </div>

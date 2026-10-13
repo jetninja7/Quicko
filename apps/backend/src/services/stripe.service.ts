@@ -6,7 +6,7 @@ let stripe: Stripe | null = null;
 
 if (STRIPE_SECRET_KEY && STRIPE_SECRET_KEY !== 'sk_test_your_stripe_secret_key') {
   stripe = new Stripe(STRIPE_SECRET_KEY, {
-    apiVersion: '2024-12-18.acacia',
+    apiVersion: '2024-04-10',
   });
   console.log('✅ Stripe initialized');
 } else {

@@ -122,7 +122,7 @@ function VerifyPageContent() {
               disabled={isLoading}
               className="text-primary-600 font-medium hover:text-primary-700 disabled:text-gray-400"
             >
-              Didn't receive code? Resend
+              Did not receive code? Resend
             </button>
           </div>
 

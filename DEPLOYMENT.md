@@ -29,6 +29,9 @@
    DATABASE_URL=<from Railway PostgreSQL>
    JWT_SECRET=<generate secure random string>
    JWT_EXPIRES_IN=7d
+   
+   ⚠️  SECURITY WARNING: Never use example or placeholder values in production!
+   Generate a strong JWT_SECRET with: openssl rand -base64 64
    STRIPE_SECRET_KEY=<your stripe secret key>
    STRIPE_WEBHOOK_SECRET=<stripe webhook secret>
    NODE_ENV=production

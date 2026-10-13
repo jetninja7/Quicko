@@ -87,6 +87,20 @@ vercel --prod
 
 Copy your backend URL (e.g., `quicko-backend.vercel.app`)
 
+### ⚠️ IMPORTANT: WebSocket Limitations on Vercel
+
+**Vercel Serverless does NOT support WebSockets.** This means:
+- ✅ REST API endpoints work perfectly
+- ❌ Real-time order tracking (WebSocket `/ws` endpoint) will NOT function
+- ❌ Live delivery updates will be unavailable
+
+**Alternatives:**
+1. **Recommended**: Deploy backend to Railway/Render for full WebSocket support
+2. **Workaround**: Use polling instead of WebSockets (degrades user experience)
+3. **Hybrid**: Keep backend on Vercel, add separate WebSocket server on Railway
+
+**If you need real-time features, use Railway deployment instead (see DEPLOYMENT.md)**
+
 ### E. Run Database Migrations
 
 You need to run migrations on the Supabase database:
