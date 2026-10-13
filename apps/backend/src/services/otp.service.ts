@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import twilio from 'twilio';
 
 const prisma = new PrismaClient();
 
@@ -9,12 +10,10 @@ const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
 let twilioClient: any = null;
 
 if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_PHONE_NUMBER) {
-  try {
-    const twilio = require('twilio');
-    twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-  } catch (error) {
-    console.warn('Twilio not configured. OTP will use development bypass mode.');
-  }
+  twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+  console.log('✅ Twilio initialized');
+} else {
+  console.warn('⚠️  Twilio not configured. OTP will use development bypass mode.');
 }
 
 function generateOTP(): string {
