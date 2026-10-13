@@ -137,7 +137,7 @@ export default function AnalyticsPage() {
 
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="text-sm font-medium text-gray-600 mb-2">
-                  Today's Revenue
+                  Today&apos;s Revenue
                 </div>
                 <div className="text-3xl font-bold text-green-600">
                   ${(stats?.todayRevenue || 0).toFixed(2)}
@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
 
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="text-sm font-medium text-gray-600 mb-2">
-                  Today's Average
+                  Today&apos;s Average
                 </div>
                 <div className="text-3xl font-bold text-orange-600">
                   ${todayAverage.toFixed(2)}

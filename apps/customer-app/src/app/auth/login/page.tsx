@@ -53,7 +53,7 @@ export default function LoginPage() {
                 disabled={isLoading}
               />
               <p className="mt-2 text-xs text-gray-500">
-                We'll send you a verification code
+                We will send you a verification code
               </p>
             </div>
 
